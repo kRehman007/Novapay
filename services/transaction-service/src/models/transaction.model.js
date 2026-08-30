@@ -39,10 +39,22 @@ const transactionSchema = new mongoose.Schema(
       trim: true,
     },
 
+    senderUserId: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
     receiverWalletId: {
       type: String,
       required: true,
       index: true,
+      trim: true,
+    },
+
+    receiverUserId: {
+      type: String,
+      required: true,
       trim: true,
     },
 
@@ -77,14 +89,15 @@ const transactionSchema = new mongoose.Schema(
       min: 0,
     },
 
+    convertedAmountMinor: {
+      type: Number,
+      default: null,
+    },
+
     feeAmountMinor: {
       type: Number,
       default: 0,
       min: 0,
-      validate: {
-        validator: Number.isInteger,
-        message: "feeAmountMinor must be an integer",
-      },
     },
 
     description: {
@@ -93,15 +106,15 @@ const transactionSchema = new mongoose.Schema(
       trim: true,
     },
 
-    reference: {
-      type: String,
-      default: null,
-      trim: true,
-    },
-
     metadata: {
       type: mongoose.Schema.Types.Mixed,
       default: {},
+    },
+
+    ledgerTransactionId: {
+      type: String,
+      default: null,
+      index: true,
     },
 
     completedAt: {
@@ -129,6 +142,11 @@ const transactionSchema = new mongoose.Schema(
       default: null,
       index: true,
     },
+
+    requestHash: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,
@@ -138,8 +156,8 @@ const transactionSchema = new mongoose.Schema(
 
 transactionSchema.index({ createdAt: -1 });
 transactionSchema.index({ status: 1, createdAt: -1 });
-transactionSchema.index({ senderWalletId: 1, createdAt: -1 });
-transactionSchema.index({ receiverWalletId: 1, createdAt: -1 });
+transactionSchema.index({ senderUserId: 1, createdAt: -1 });
+transactionSchema.index({ receiverUserId: 1, createdAt: -1 });
 
 const Transaction = mongoose.model("Transaction", transactionSchema);
 
