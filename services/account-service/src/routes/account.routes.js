@@ -8,7 +8,7 @@ router.post("/accounts", accountController.createUser);
 router.post("/accounts/auth", accountController.authenticateUser);
 
 // Service-to-service routes
-router.get(
+router.post(
   "/accounts/validate",
   authenticateService,
   accountController.validateWallets

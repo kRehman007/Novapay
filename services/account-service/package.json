@@ -6,8 +6,11 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "jest --coverage --detectOpenHandles",
-    "test:watch": "jest --watch"
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "jest --coverage --detectOpenHandles --testPathPattern=account.test.js",
+    "test:integration": "jest --coverage --detectOpenHandles --testPathPattern=integration",
+    "test:watch": "jest --watch",
+    "test:manual": "powershell -ExecutionPolicy Bypass -File .\\test-api.ps1"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
