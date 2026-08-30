@@ -1,7 +1,7 @@
 // FxRate stores the current/reference exchange rate obtained from an FX provider, 
 // while FxQuote uses that rate to create a specific,
 // temporary conversion offer for a particular amount and transaction.
-
+// It is the current exchange rate between these two currencies
 const mongoose = require("mongoose");
 
 const fxRateSchema = new mongoose.Schema(

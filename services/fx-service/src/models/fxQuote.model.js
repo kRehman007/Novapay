@@ -1,8 +1,9 @@
 // What is an FX Quote?
 // In your NovaPay system, FxQuote means Foreign Exchange Quote.
+// It represents a temporary offer for converting one currency into another at a 
+// specific exchange rate.
 
-// It represents a temporary offer for converting one currency into another at a specific exchange rate.
-
+// It represents an exchange rate for a particular proposed transaction
 // For example, a user wants to send:
 // 100 USD → PKR
 
