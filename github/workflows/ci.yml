@@ -1,0 +1,165 @@
+name: NovaPay CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-api-gateway:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/api-gateway
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: services/api-gateway/package-lock.json
+      - run: npm ci
+      - run: npm test
+
+  test-account-service:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: --replSet rs0
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+    defaults:
+      run:
+        working-directory: services/account-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: services/account-service/package-lock.json
+      - run: npm ci
+      - run: npm run test:unit
+
+  test-transaction-service:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: --replSet rs0
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+    defaults:
+      run:
+        working-directory: services/transaction-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: services/transaction-service/package-lock.json
+      - run: npm ci
+      - run: npm run test:unit
+
+  test-ledger-service:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: --replSet rs0
+    defaults:
+      run:
+        working-directory: services/ledger-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: services/ledger-service/package-lock.json
+      - run: npm ci
+      - run: npm run test:unit
+
+  test-fx-service:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: --replSet rs0
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+    defaults:
+      run:
+        working-directory: services/fx-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: services/fx-service/package-lock.json
+      - run: npm ci
+      - run: npm run test:unit
+
+  test-payroll-service:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: --replSet rs0
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+    defaults:
+      run:
+        working-directory: services/payroll-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: services/payroll-service/package-lock.json
+      - run: npm ci
+      - run: npm run test:unit
+
+  test-admin-service:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: --replSet rs0
+    defaults:
+      run:
+        working-directory: services/admin-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: services/admin-service/package-lock.json
+      - run: npm ci
+      - run: npm run test:unit

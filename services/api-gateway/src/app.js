@@ -8,9 +8,13 @@ const { errorHandler, notFound } = require("./middleware/error.middleware");
 const gatewayRoutes = require("./routes/gateway.routes");
 const { healthCheck } = require("./services/gateway.service");
 const { createLogger } = require("./utils/logger");
+const { metricsMiddleware, getMetrics, getContentType } = require("./middleware/metrics.middleware");
 
 const app = express();
 const logger = createLogger({ component: "app" });
+
+// Metrics middleware
+app.use(metricsMiddleware);
 
 app.use(helmet());
 app.use(cors());
@@ -44,6 +48,12 @@ app.get("/health", async (req, res) => {
       error: error.message,
     });
   }
+});
+
+// Metrics endpoint
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", getContentType());
+  res.end(await getMetrics());
 });
 
 app.use("/api", authenticateToken, gatewayRoutes);
