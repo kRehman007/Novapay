@@ -13,7 +13,6 @@ const ledgerEntrySchema = new mongoose.Schema(
     transactionId: {
       type: String,
       required: true,
-      index: true,
       trim: true,
     },
 
@@ -58,7 +57,6 @@ const ledgerEntrySchema = new mongoose.Schema(
     fxQuoteId: {
       type: String,
       default: null,
-      index: true,
     },
 
     feeEntryType: {
