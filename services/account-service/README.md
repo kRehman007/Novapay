@@ -204,21 +204,4 @@ Client → Account Service → Redis Cache
 npm test
 ```
 
-## Architecture
 
-```
-account-service/
-├── src/
-│   ├── config/          # Database, Redis configuration
-│   ├── controllers/     # Request handlers
-│   ├── middleware/       # Auth, error handling
-│   ├── models/          # Mongoose schemas
-│   ├── repositories/    # Database queries
-│   ├── routes/          # API routes
-│   ├── services/        # Business logic
-│   ├── test/            # Unit tests
-│   └── utils/           # Helpers (encryption, ID generation)
-├── .env
-├── package.json
-└── README.md
-```
