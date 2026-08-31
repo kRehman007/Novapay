@@ -56,7 +56,7 @@ app.get("/metrics", async (req, res) => {
   res.end(await getMetrics());
 });
 
-app.use("/api", authenticateToken, gatewayRoutes);
+app.use("/api", gatewayRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

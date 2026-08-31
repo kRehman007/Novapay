@@ -53,14 +53,14 @@ class TransactionService {
     }
 
     // 3. Check sender balance
-    const senderBalance = await this.getBalance(senderWalletId);
+    const senderBalance = await this.getBalance(senderUserId, currency);
     if (senderBalance < amountMinor) {
       const error = new Error("Insufficient balance");
       error.statusCode = 400;
       throw error;
     }
 
-    // 4. Create idempotency key record
+    // 4. Create idempotency key
     const expiresAt = new Date(Date.now() + IDEMPOTENCY_TTL_HOURS * 60 * 60 * 1000);
     if (!existingKey) {
       await this.idempotencyRepo.create({
@@ -165,7 +165,7 @@ class TransactionService {
     }
 
     // 4. Check sender balance
-    const senderBalance = await this.getBalance(senderWalletId);
+    const senderBalance = await this.getBalance(senderUserId, currency);
     if (senderBalance < amountMinor) {
       const error = new Error("Insufficient balance");
       error.statusCode = 400;
@@ -408,9 +408,9 @@ class TransactionService {
     }
   }
 
-  async getBalance(walletId) {
+  async getBalance(userId, currency) {
     try {
-      const cacheKey = `balance:${walletId}`;
+      const cacheKey = `balance:${userId}:${currency || "USD"}`;
       const redis = getRedisClient();
 
       if (redis) {
@@ -420,15 +420,16 @@ class TransactionService {
         }
       }
 
-      // Fallback to account service
       const response = await axios.get(
-        `${ACCOUNT_SERVICE_URL}/api/internal/accounts/${walletId}/balance`,
-        { headers: { "X-Service-Key": SERVICE_KEY } }
+        `${ACCOUNT_SERVICE_URL}/api/internal/accounts/${userId}/balance`,
+        {
+          params: { currency: currency || "USD" },
+          headers: { "X-Service-Key": SERVICE_KEY } }
       );
 
       return response.data.data.balance;
     } catch (error) {
-      logger.error("Failed to get balance", { walletId, error: error.message });
+      logger.error("Failed to get balance", { userId, error: error.message });
       throw error;
     }
   }

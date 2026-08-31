@@ -1,8 +1,7 @@
-version: '3.8'
-
 services:
   nginx:
     image: nginx:alpine
+    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
@@ -16,6 +15,7 @@ services:
     build:
       context: ../services/api-gateway
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - "4000:4000"
     environment:
@@ -42,15 +42,17 @@ services:
     build:
       context: ../services/account-service
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - "4001:4001"
     environment:
       - PORT=4001
-      - MONGODB_URI=mongodb://mongodb-account:27017/novapay_account_db?replicaSet=rs0
+      - MONGODB_URI=mongodb://mongodb-account:27017/novapay_account_db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - JWT_SECRET=novapay_jwt_secret_2024
       - SERVICE_KEY=7fK9xP2mQ8vL4nR6tY3wZ1aB5kT0eH
+      - ENCRYPTION_KEY=1eb1d90f2f1cfe99812b98a8153a81b1
     depends_on:
       - mongodb-account
       - redis
@@ -61,13 +63,15 @@ services:
     build:
       context: ../services/transaction-service
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - "4002:4002"
     environment:
       - PORT=4002
-      - MONGODB_URI=mongodb://mongodb-transaction:27017/novapay_txn_db?replicaSet=rs0
+      - MONGODB_URI=mongodb://mongodb-transaction:27017/novapay_txn_db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - JWT_SECRET=novapay_jwt_secret_2024
       - SERVICE_KEY=7fK9xP2mQ8vL4nR6tY3wZ1aB5kT0eH
       - ACCOUNT_SERVICE_URL=http://account-service:4001
       - LEDGER_SERVICE_URL=http://ledger-service:4003
@@ -85,11 +89,12 @@ services:
     build:
       context: ../services/ledger-service
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - "4003:4003"
     environment:
       - PORT=4003
-      - MONGODB_URI=mongodb://mongodb-ledger:27017/novapay_ledger_db?replicaSet=rs0
+      - MONGODB_URI=mongodb://mongodb-ledger:27017/novapay_ledger_db
       - SERVICE_KEY=7fK9xP2mQ8vL4nR6tY3wZ1aB5kT0eH
     depends_on:
       - mongodb-ledger
@@ -100,11 +105,12 @@ services:
     build:
       context: ../services/fx-service
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - "4004:4004"
     environment:
       - PORT=4004
-      - MONGODB_URI=mongodb://mongodb-fx:27017/novapay_fx_db?replicaSet=rs0
+      - MONGODB_URI=mongodb://mongodb-fx:27017/novapay_fx_db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - SERVICE_KEY=7fK9xP2mQ8vL4nR6tY3wZ1aB5kT0eH
@@ -118,11 +124,12 @@ services:
     build:
       context: ../services/payroll-service
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - "4005:4005"
     environment:
       - PORT=4005
-      - MONGODB_URI=mongodb://mongodb-payroll:27017/novapay_payroll_db?replicaSet=rs0
+      - MONGODB_URI=mongodb://mongodb-payroll:27017/novapay_payroll_db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - SERVICE_KEY=7fK9xP2mQ8vL4nR6tY3wZ1aB5kT0eH
@@ -138,11 +145,12 @@ services:
     build:
       context: ../services/admin-service
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - "4006:4006"
     environment:
       - PORT=4006
-      - MONGODB_URI=mongodb://mongodb-admin:27017/novapay_admin_db?replicaSet=rs0
+      - MONGODB_URI=mongodb://mongodb-admin:27017/novapay_admin_db
       - SERVICE_KEY=7fK9xP2mQ8vL4nR6tY3wZ1aB5kT0eH
       - ACCOUNT_SERVICE_URL=http://account-service:4001
       - TRANSACTION_SERVICE_URL=http://transaction-service:4002
@@ -159,7 +167,6 @@ services:
     image: mongo:7.0
     ports:
       - "27017:27017"
-    command: mongod --replSet rs0
     volumes:
       - mongodb-account-data:/data/db
     networks:
@@ -169,7 +176,6 @@ services:
     image: mongo:7.0
     ports:
       - "27018:27017"
-    command: mongod --replSet rs0
     volumes:
       - mongodb-transaction-data:/data/db
     networks:
@@ -179,7 +185,6 @@ services:
     image: mongo:7.0
     ports:
       - "27019:27017"
-    command: mongod --replSet rs0
     volumes:
       - mongodb-ledger-data:/data/db
     networks:
@@ -189,17 +194,14 @@ services:
     image: mongo:7.0
     ports:
       - "27020:27017"
-    command: mongod --replSet rs0
     volumes:
       - mongodb-fx-data:/data/db
     networks:
       - novapay
-
   mongodb-payroll:
     image: mongo:7.0
     ports:
       - "27021:27017"
-    command: mongod --replSet rs0
     volumes:
       - mongodb-payroll-data:/data/db
     networks:
@@ -209,7 +211,6 @@ services:
     image: mongo:7.0
     ports:
       - "27022:27017"
-    command: mongod --replSet rs0
     volumes:
       - mongodb-admin-data:/data/db
     networks:
@@ -235,14 +236,15 @@ services:
 
   grafana:
     image: grafana/grafana:latest
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
     depends_on:
       - prometheus
     networks:

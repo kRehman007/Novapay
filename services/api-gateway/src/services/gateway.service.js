@@ -26,12 +26,12 @@ function getServiceForPath(path) {
 }
 
 async function proxyRequest(req, res) {
-  const service = getServiceForPath(req.path);
+  const service = getServiceForPath(req.originalUrl);
   if (!service) {
     return res.status(404).json({ success: false, error: "No service found for path" });
   }
 
-  const targetUrl = `${service.url}${req.path}`;
+  const targetUrl = `${service.url}${req.originalUrl}`;
 
   try {
     const response = await axios({
@@ -43,7 +43,6 @@ async function proxyRequest(req, res) {
         "X-Service-Key": SERVICE_KEY,
       },
       data: req.body,
-      params: req.query,
       timeout: 30000,
     });
 
